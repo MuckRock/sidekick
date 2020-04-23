@@ -1,0 +1,14 @@
+.DS_Store
+._*
+
+data/collections
+
+# Compressed numpy arrays
+*.npz
+
+# Word vectors
+*.vec
+*.bin
+
+# Node
+node_modules
