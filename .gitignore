@@ -2,6 +2,7 @@
 ._*
 
 data/collections
+models/
 
 # Compressed numpy arrays
 *.npz
@@ -12,3 +13,10 @@ data/collections
 
 # Node
 node_modules
+
+# Rust
+preprocess/symspell/bindings/Python/dist
+preprocess/symspell/bindings/Python/build
+preprocess/symspell/bindings/Python/symspell_rs.egg-info
+preprocess/symspell/bindings/Python/target
+preprocess/symspell/**/*.so

@@ -1,0 +1,34 @@
+[package]
+name = "symspell"
+version = "0.4.0"
+license = "MIT"
+authors = ["Rene Klacan <rene.klacan@gmail.com>"]
+keywords = ["spellcheck"]
+description = "Spelling correction & Fuzzy search"
+homepage = "https://github.com/reneklacan/symspell"
+repository = "https://github.com/reneklacan/symspell"
+exclude = [
+    "data/*","examples/*","Cargo.lock",
+]
+
+[lib]
+name = "symspell"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+strsim = "^0.9"
+derive_builder = "^0.9"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+unidecode = "^0.3"
+
+[target.wasm32-unknown-unknown.dependencies]
+serde = "^1.0.59"
+serde_derive = "^1.0.59"
+wasm-bindgen = { version = "^0.2", features = ["serde-serialize"]}
+
+[target.wasm32-unknown-unknown.dev-dependencies]
+wasm-bindgen-test = "^0.2"
+
+[dev-dependencies]
