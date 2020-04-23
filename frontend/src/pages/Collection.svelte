@@ -61,7 +61,7 @@
     newTag = "";
   }
 
-  const documentTags = {};
+  let documentTags = {};
 
   function expandConstraints(documentTags) {
     const tags = Object.keys(documentTags);
@@ -100,6 +100,7 @@
     });
 
     console.log("constraints", { constraints, positiveDocs });
+    console.log("document tags", documentTags);
 
     return { constraints, positiveDocs };
   }
@@ -216,7 +217,6 @@
     }
   }
 
-  const sortDict = {};
   let lastSort = null;
 
   function sort(tagName, descending = true) {
@@ -227,7 +227,6 @@
       const p2 = docPercentileDict[tagName][b.index];
       return (p1 - p2) * (descending ? -1 : 1);
     });
-    sortDict[tagName] = descending;
     lastSort = [tagName, descending];
   }
 
@@ -242,13 +241,14 @@
 
   function shuffleDocs() {
     documents = shuffle(documents);
+    lastSort = null;
   }
 
   function defaultTagSort(tagName) {
-    if (sortDict[tagName] == null) {
-      sort(tagName, false);
+    if (lastSort == null || lastSort[0] != tagName) {
+      sort(tagName, true);
     } else {
-      sort(tagName, !sortDict[tagName]);
+      sort(tagName, !lastSort[1]);
     }
   }
 
@@ -269,6 +269,92 @@
       name: document
     }));
   });
+
+  async function handleKeypress(e) {
+    if (e.code == "Semicolon" && e.altKey) {
+      // Easter egg: auto-load reasonable demo data for FBI docs
+      tags = ["Responsive", "Nonresponsive", "Threats"];
+      documentTags = {
+        Responsive: {
+          "9": -1,
+          "18": -1,
+          "24": -1,
+          "27": -1,
+          "31": -1,
+          "35": -1,
+          "36": -1,
+          "42": -1,
+          "43": -1,
+          "44": -1,
+          "51": -1,
+          "61": -1,
+          "62": -1,
+          "64": -1,
+          "65": -1,
+          "66": -1,
+          "67": 1,
+          "68": 1,
+          "72": -1,
+          "80": 1,
+          "82": -1,
+          "83": 1,
+          "84": 1,
+          "86": -1,
+          "87": -1,
+          "89": -1,
+          "92": -1,
+          "93": 1,
+          "97": 1,
+          "98": 1,
+          "99": 1
+        },
+        Nonresponsive: {
+          "9": 1,
+          "18": 1,
+          "24": 1,
+          "27": 1,
+          "31": 1,
+          "35": 1,
+          "36": 1,
+          "42": 1,
+          "43": 1,
+          "44": 1,
+          "51": 1,
+          "61": 1,
+          "62": 1,
+          "64": 1,
+          "65": 1,
+          "66": 1,
+          "67": -1,
+          "68": -1,
+          "72": 1,
+          "80": -1,
+          "82": 1,
+          "83": -1,
+          "84": -1,
+          "86": 1,
+          "87": 1,
+          "89": 1,
+          "92": 1,
+          "93": -1,
+          "97": -1,
+          "98": -1,
+          "99": -1
+        },
+        Threats: {
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "16": 1,
+          "17": 1
+        }
+      };
+    } else if (e.code == "KeyM" && e.altKey) {
+      await updateModel();
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -335,6 +421,21 @@
     .tag {
       display: inline-block;
       vertical-align: middle;
+      user-select: none;
+      cursor: pointer;
+
+      &.active {
+        color: $blue;
+      }
+
+      .sorter {
+        font-size: 9px;
+        margin-left: 3px;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     .tagcell {
@@ -437,10 +538,18 @@
             </button>
           </th>
           {#each tags as tag, i}
-            <th
-              class:norightborder={i == tags.length - 1}
-              on:click={() => defaultTagSort(tag)}>
-              <span class="tag">{tag}</span>
+            <th class:norightborder={i == tags.length - 1}>
+              <span
+                class="tag"
+                on:click={() => defaultTagSort(tag)}
+                class:active={lastSort != null && lastSort[0] == tag}>
+                {tag}
+                <span class="sorter">
+                  {#if lastSort != null && lastSort[0] == tag}
+                    {#if lastSort[1]}▼{:else}▲{/if}
+                  {/if}
+                </span>
+              </span>
               {#if tags.length != 1}
                 <Delete
                   disabled={tags.length == 1}
@@ -486,7 +595,7 @@
                 class:positive={documentTags[tag] && documentTags[tag][document.index] == 1}
                 class:negative={documentTags[tag] && documentTags[tag][document.index] == -1}>
                 {#if docPercentileDict[tag] != null}
-                  {((1 - docPercentileDict[tag][document.index]) * 100).toFixed(2)}%
+                  {(docPercentileDict[tag][document.index] * 100).toFixed(2)}%
                 {/if}
                 <ModelButton
                   status={documentTags[tag] ? documentTags[tag][document.index] || 0 : 0}
@@ -506,3 +615,5 @@
     {/if}
   </div>
 </MainTemplate>
+
+<svelte:window on:keypress={handleKeypress} />

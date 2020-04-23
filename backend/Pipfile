@@ -10,6 +10,7 @@ flask = "*"
 scipy = "*"
 numpy = "*"
 flask-cors = "*"
+numba = "*"
 
 [requires]
 python_version = "3.7"

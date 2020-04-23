@@ -10,6 +10,7 @@ models/
 # Word vectors
 *.vec
 *.bin
+*.bin.gz
 *.bin.gz.part
 
 # Node

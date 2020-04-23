@@ -4,6 +4,10 @@ import os
 import re
 import glob
 import json
+import numpy as np
+from lego_metric_learner import lego_learn
+import time
+
 
 # Constants
 MODELS_DIR = "../models"
@@ -29,6 +33,21 @@ collections = [
 collection_params = {
     collection["name"]: collection["params"] for collection in collections
 }
+
+collection_doc_vectors = {}
+
+
+def get_collection_doc_vectors(collection_name):
+    if collection_name in collection_doc_vectors:
+        return collection_doc_vectors[collection_name]
+
+    doc_vector_obj = np.load(
+        os.path.join(MODELS_DIR, collection_name, "doc_vectors.npz")
+    )
+    # Grab document vector matrix
+    doc_vectors = doc_vector_obj.get(doc_vector_obj.files[0])
+    collection_doc_vectors[collection_name] = doc_vectors
+    return doc_vectors
 
 
 app = Flask(__name__)
@@ -74,6 +93,9 @@ def list_documents():
     text_file_names = sorted(
         glob.glob(os.path.join(text_dir, f"*{DOC_EXTENSION}")), key=alpha_num_order
     )
+
+    get_collection_doc_vectors(collection_name)
+
     return jsonify(
         [name[: -len(DOC_EXTENSION)].split("/")[-1] for name in text_file_names]
     )
@@ -95,30 +117,15 @@ def get_document():
 
 @app.route("/update_tags", methods=["POST"])
 def update_tags():
-    # TODO: clean up this code
-
     collection_name = request.args.get("collection")
     params = request.get_json()
     constraints = params["constraints"]
     positive_docs = params["positiveDocs"]
 
-    import numpy as np
-
-    doc_vector_obj = np.load(
-        os.path.join(MODELS_DIR, collection_name, "doc_vectors.npz")
-    )
-    # Grab document vector matrix
-    doc_vectors = doc_vector_obj.get(doc_vector_obj.files[0])
-
-    from lego_metric_learner import batch_update
-    from scipy import stats
-    from scipy.spatial.distance import cosine
-
     dists = {}
     percentiles = {}
     percentile_dicts = {}
-
-    import time
+    doc_vectors = get_collection_doc_vectors(collection_name)
 
     start_time = time.monotonic()
 
@@ -128,41 +135,10 @@ def update_tags():
         print("\n")
 
     for tag in constraints.keys():
-
-        p_time("updating constraints")
-        sub_constraints = constraints[tag]
-
-        if len(sub_constraints) != 0:
-            A_updated = batch_update(doc_vectors, sub_constraints)
-
-            p_time("choleskying")
-
-            L = np.linalg.cholesky(A_updated)  # the lower tri matrix
-            # use the new metric to calculate a mean doc vector (using only positive docs)
-
-            p_time("calculating mean vec")
-            positive_docs_idx = positive_docs[tag]
-            tfidf_vecs_postive_docs = doc_vectors[positive_docs_idx]
-            mean_vec = np.mean(np.dot(tfidf_vecs_postive_docs, L), axis=0)
-
-            p_time("getting updated vecs")
-            # compare all docs in the table builder to the mean vector
-            # and return list in order of similarity
-            updated_tfidf_vecs = np.dot(doc_vectors, L)
-        else:
-            # No constraints, go purely off positive docs
-            positive_docs_idx = positive_docs[tag]
-            tfidf_vecs_postive_docs = doc_vectors[positive_docs_idx]
-            mean_vec = np.mean(tfidf_vecs_postive_docs, axis=0)
-            updated_tfidf_vecs = doc_vectors
-
-        p_time("getting doc dists")
-        # Generate cutoff percentiles for documents for model
-        doc_dists = np.nan_to_num(
-            [cosine(arr, mean_vec) for arr in updated_tfidf_vecs], 1
+        p_time("running everything")
+        doc_dists, doc_percentiles = lego_learn(
+            doc_vectors, constraints[tag], positive_docs[tag],
         )
-        p_time("getting doc percentiles")
-        doc_percentiles = stats.rankdata(doc_dists, "average") / len(doc_dists)
         percentile_dict = {k: v for k, v in enumerate(doc_percentiles)}
         dists[tag] = doc_dists.tolist()
         percentiles[tag] = [

@@ -1,7 +1,88 @@
 # Adapted from https://bitbucket.org/muckdoc/muckdoc/
 # Look into faster version, e.g. from https://github.com/fcaldas/MetricLearning/blob/master/lego_functions.py
 
+import numba
+from numba import njit
 import numpy as np
+from scipy import stats
+from scipy.spatial.distance import cdist
+
+
+@njit
+def update(X_i, X_j, y, A, u=7, l=10, gamma=0.08):
+    diff = X_i - X_j
+    d = np.dot(diff, np.dot(A, diff))
+    if (d > u and y == 1) or (d < l and y == -1):
+        target = u * (y == 1) + l * (y == -1)
+        _y = (
+            (gamma * d * target - 1)
+            + np.sqrt((gamma * d * target - 1) ** 2 + 4 * gamma * d * d)
+        ) / (2 * gamma * d)
+        return A - (
+            (gamma * (_y - target)) / (1 + gamma * (_y - target) * d)
+        ) * np.outer(np.dot(A, diff), np.dot(A, diff))
+    else:
+        return A
+
+
+@numba.jit(target="cpu", nopython=True, parallel=True)
+def fast_cosine_matrix(u, M):
+    # From https://stackoverflow.com/a/47316253
+    scores = np.zeros(M.shape[0])
+    for i in numba.prange(M.shape[0]):
+        v = M[i]
+        m = u.shape[0]
+        udotv = 0
+        u_norm = 0
+        v_norm = 0
+        for j in range(m):
+            if (np.isnan(u[j])) or (np.isnan(v[j])):
+                continue
+
+            udotv += u[j] * v[j]
+            u_norm += u[j] * u[j]
+            v_norm += v[j] * v[j]
+
+        u_norm = np.sqrt(u_norm)
+        v_norm = np.sqrt(v_norm)
+
+        if (u_norm == 0) or (v_norm == 0):
+            ratio = 1.0
+        else:
+            ratio = udotv / (u_norm * v_norm)
+        scores[i] = ratio
+    return scores
+
+
+@njit
+def get_mean_vec_(A_updated, doc_vectors, positive_doc_vectors):
+    L = np.linalg.cholesky(A_updated)
+    # mean with axis is not supported in numba, so accomplish with sum
+    mean_vec = np.sum(np.dot(positive_doc_vectors, L), 0) / L.shape[0]
+
+    # Mean vector ordered list
+    updated_doc_vectors = np.dot(doc_vectors, L)
+    return updated_doc_vectors, mean_vec
+
+
+def get_mean_vec(doc_vectors, constraints, positive_docs):
+    if len(constraints) == 0:
+        # No constraints, go purely off positive docs
+        positive_doc_vectors = doc_vectors[positive_docs]
+        mean_vec = np.mean(positive_doc_vectors, axis=0)
+        return doc_vectors, mean_vec
+
+    A_updated = batch_update(doc_vectors, constraints)
+    return get_mean_vec_(A_updated, doc_vectors, doc_vectors[positive_docs])
+
+
+def lego_learn(doc_vectors, constraints, positive_docs):
+    updated_doc_vectors, mean_vec = get_mean_vec(
+        doc_vectors, constraints, positive_docs
+    )
+    doc_dists = fast_cosine_matrix(mean_vec, updated_doc_vectors)
+    doc_percentiles = stats.rankdata(doc_dists, "average") / len(doc_dists)
+    return doc_dists, doc_percentiles
 
 
 def lego(u, v, y, r=0.5, A_prev=None):
@@ -38,14 +119,18 @@ def lego(u, v, y, r=0.5, A_prev=None):
 
 # iterates through the constraints and updates the A matrix
 # TODO: look into min_max_ys. What does it do? Copied these values from pickled file
-def batch_update(tfidf_mat, constraints, min_max_ys=[7, 10], A_=None):
+def batch_update(doc_vectors, constraints):
+    A_ = np.identity(doc_vectors.shape[1])
+
     # TODO: Doc string from Sriram
     for doc_u, doc_v, same_class in constraints:
-        u_t = tfidf_mat[doc_u]
-        v_t = tfidf_mat[doc_v]
+        u_t = doc_vectors[doc_u]
+        v_t = doc_vectors[doc_v]
         if same_class == 1:
-            y_t = min_max_ys[0]
+            y_t = 1
         else:
-            y_t = min_max_ys[1]
-        A_ = lego(u_t, v_t, y_t, A_prev=A_)
+            y_t = -1
+        # A_ = lego(u_t, v_t, y_t, A_prev=A_)
+        A_ = update(u_t, v_t, y_t, A_)
+
     return A_
