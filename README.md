@@ -8,7 +8,7 @@ To begin, you need a large collection of `.txt` files (recommended to place in `
 
 ```bash
 cd preprocess
-pipenv run preprocess.py [text_file_directory] [model_name]
+pipenv run python preprocess.py [text_file_directory] [model_name]
 ```
 
 where `[text_file_directory]` is a directory that contains top-level `.txt` files you wish to process and `[model_name]` is a simple string identifier for your model (e.g. `fbi`).
@@ -25,7 +25,7 @@ The backend is a minimal Flask app. There are provided Makefiles to quickly run 
 make server
 ```
 
-The server will launch at `localhost:5000`, but it is an API server only. Run the frontend following the steps below to access the UI.
+The server will launch at `localhost:5000` with auto-reload, but it is an API server only. Run the frontend following the steps below to access the UI.
 
 ## Running the frontend
 
@@ -42,6 +42,6 @@ Then, from the top-level, you can use the provided Makefile to run the frontend 
 make web
 ```
 
-The server will launch at `http://localhost:3000`.
+The auto-reloading server will launch at `http://localhost:3000`.
 
 The frontend assumes the backend is running on port 5000. You can change the server URL in the `frontend` directory by modifying `.env`.

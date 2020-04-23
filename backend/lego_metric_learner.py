@@ -1,4 +1,5 @@
 # Adapted from https://bitbucket.org/muckdoc/muckdoc/
+# Look into faster version, e.g. from https://github.com/fcaldas/MetricLearning/blob/master/lego_functions.py
 
 import numpy as np
 
