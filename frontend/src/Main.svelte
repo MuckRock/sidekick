@@ -2,11 +2,11 @@
   import { router, Router, currentUrl } from "@/router/router";
   import { routes } from "@/routes";
   import { onMount } from "svelte";
+  // Global styles
   import GlobalStyle from "./GlobalStyle";
 
   // Set up routes
   router.routes = new Router(...routes);
-
   onMount(() => {
     router.currentUrl = currentUrl();
     if (!history.state) {
@@ -17,7 +17,6 @@
       );
     }
   });
-
   function handleBackNav(e) {
     router.currentUrl = e.state.path;
   }
@@ -27,8 +26,8 @@
 
 <svelte:window on:popstate={handleBackNav} />
 
-{#if $router.resolvedRoute != null}
+{#if router.resolvedRoute != null}
   <svelte:component
-    this={$router.resolvedRoute.component}
-    {...$router.resolvedRoute.props} />
+    this={router.resolvedRoute.component}
+    {...router.resolvedRoute.props} />
 {/if}
