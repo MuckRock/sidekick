@@ -1,38 +1,21 @@
 FROM python:3.7-slim
 
 COPY symspell /code/symspell
-# COPY Pipfile /code
-# COPY Pipfile.lock /code
-
+COPY preprocess.py /code/preprocess.py
 
 WORKDIR /code
 
-
-# RUN apk add py3-numpy
-# RUN pip install numpy
-
+# Install build/dev tools
 RUN apt-get update \
-&& apt-get install gcc curl -y \
+&& apt-get install gcc curl git g++ -y \
 && apt-get clean
-RUN bash $HOME/.cargo/env
 
+# Install Rust
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
-PATH="$HOME/.cargo/bin:$PATH" pip install ./symspell/bindings/Python
-
+# Install Python requirements
 RUN pip install numpy scipy cython scikit-learn setuptools-rust
+RUN PATH="$HOME/.cargo/bin:$PATH" pip install -e ./symspell/bindings/Python
+RUN pip install -e git://github.com/facebookresearch/fastText.git#egg=fasttext
 
-CMD sh
-
-# RUN pip install pipenv
-# RUN pipenv install
-
-
-# WORKDIR /code
-# ENV FLASK_APP=app.py
-# ENV FLASK_RUN_HOST=0.0.0.0
-# RUN apk add --no-cache gcc musl-dev linux-headers
-# COPY requirements.txt requirements.txt
-# RUN pip install -r requirements.txt
-# EXPOSE 5000
-# COPY . .
-# CMD ["flask", "run"]
+CMD bash

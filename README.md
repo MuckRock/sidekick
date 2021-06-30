@@ -51,3 +51,7 @@ make web
 The auto-reloading server will launch at `http://localhost:3000`.
 
 The frontend assumes the backend is running on port 5000. You can change the server URL in the `frontend` directory by modifying `.env`.
+
+### Commands
+
+docker compose build preprocess && docker compose run -v ./preprocess/symspell:/symspell -e DOC_DIR=symspell --rm preprocess

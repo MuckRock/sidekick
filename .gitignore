@@ -1,7 +1,8 @@
 .DS_Store
 ._*
 
-data/collections
+data/collections/*
+!data/collections/amazon_instrument_reviews
 models/
 
 # Compressed numpy arrays

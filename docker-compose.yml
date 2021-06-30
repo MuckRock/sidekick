@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   preprocess:
+    image: documentcloud/sidekick_preprocess
     build:
       context: ./preprocess
       dockerfile: ./Dockerfile
