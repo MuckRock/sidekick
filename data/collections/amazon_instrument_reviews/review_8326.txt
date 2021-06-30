@@ -1,0 +1,1 @@
+It works really well for tunings other than standard EADGBE.  I am still trying to get it tuning in standard, but so far it's pretty accurate.  I know it can do standard tuning, i just can't figure it out.

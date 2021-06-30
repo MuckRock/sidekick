@@ -1,0 +1,1 @@
+When set on blink, they blink way too fast.  When not set on blink, all 4 lights come on and focused into just 1 spot that the combined color come out white.  Useless design.

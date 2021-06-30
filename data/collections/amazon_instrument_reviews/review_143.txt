@@ -1,0 +1,1 @@
+This converts an xlr signal (for me, a Shure SM57 mic) into a 1/4 male (I run it into a guitar pedalboard and then an amp).  Have no issues with performance but the converter is a little bulky especially once you clip a mic onto that.  Could be tight fitting into certain places on a pedalboard but works great overall.

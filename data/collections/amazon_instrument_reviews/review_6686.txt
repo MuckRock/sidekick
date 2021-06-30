@@ -1,0 +1,1 @@
+Every midi usb converter on amazon below 50 bucks seemed sketchy, but I tried this one with my Casio keyboard. Works on Logic and Garageband, however whenever I try to use modulation or pitch bend, it creates a actual note on my Mac and won't stop unless you quit the program. Be wary.

@@ -1,0 +1,1 @@
+Works perfectly.  Got the drivers for Mac from the website and it instantly showed up in core-audio. Very easy to use. Love it!

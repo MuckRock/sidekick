@@ -1,0 +1,1 @@
+Cheap, works great for playing and foot controllers. Will not handle bulk dumps, so I have to use a different interface for programming and backups.

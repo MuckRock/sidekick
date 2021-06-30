@@ -1,0 +1,1 @@
+plugged it in and it works to connect a mono line out to the stereo input on a Lepai amp. not much else I can tell you

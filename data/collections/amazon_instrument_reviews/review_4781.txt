@@ -1,0 +1,1 @@
+Boosts the signal without too much noise, though not totally quiet.  Good for lead w/ single channel amps; boosting signal into effects that vary depending on signal strength--especially at lower practice volumes.  Should be INEXPENSIVE!

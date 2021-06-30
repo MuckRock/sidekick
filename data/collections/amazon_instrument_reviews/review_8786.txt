@@ -1,0 +1,1 @@
+Make sure you get a Diago power supply or one that can deliver more than 500MA the one sent from Line6 is only 250MA, huge error from L6!

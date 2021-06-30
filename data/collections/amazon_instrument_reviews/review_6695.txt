@@ -1,0 +1,1 @@
+Doesn't wotk with V-Amp 3.  Doubt it works at all.  Red light always stays on and I've never seen the green light.

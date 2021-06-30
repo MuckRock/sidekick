@@ -1,0 +1,1 @@
+If you want to use this to power up a Tascam DR series digital recorder, I have a less expensive solution for you:  if you own a usb wall charger (like a cell phone charger), you can use that to power your device through its usb port. That's a lot cheaper than spending twenty-something dollars on an additional wall wart!

@@ -1,0 +1,1 @@
+got this to run instruments into my comp to use with sony acid, and this works well. I had problems with the sony acid (latency, boo) and while I downloaded an asio program to cut the latency, I don't use it really now, but is good to have when and if I use the sony for recording and not just mixing. the stereo sound on this is great, like true guitar stereo.

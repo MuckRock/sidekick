@@ -1,0 +1,1 @@
+This device is a converter that works with RCA inputs and outputs.  The Input seems to be geared for the -10DB range for consumer level audio range.  This box also has the ability to monitor the input directly with headphones.

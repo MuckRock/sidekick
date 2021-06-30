@@ -1,0 +1,1 @@
+I was able to connect it to my PC. There was a horrible delay between the keyboard and the PC, but once I installed better midi software (CoolSoft VirtualMIDISynth) and turned down the delay, it's nearly realtime. I had problems getting it to work on my iMac. It recognized the device's presence, but it didn't produce any sound on the computer.

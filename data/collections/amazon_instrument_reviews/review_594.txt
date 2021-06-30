@@ -1,0 +1,1 @@
+I'm not very familiar with how pop filters actually work, apart from getting rid of unnecessary peaks when recording. I have noticed an improvement in recording quality with this pop filter on. I don't know how it compares to other pop filters though, but this one seems like it works for me.

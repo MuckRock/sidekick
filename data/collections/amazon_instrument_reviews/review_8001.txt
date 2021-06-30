@@ -1,0 +1,1 @@
+Nice and thick, the adhesive is very strong. I have used it on microphone electronics to shield out RF noise. If you don't have the shielding grounded, or in a continuous loop, it won't work. If you hear hum, it's not the shielding, it's your technique.

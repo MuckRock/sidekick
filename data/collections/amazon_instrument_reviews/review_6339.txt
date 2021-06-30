@@ -1,0 +1,1 @@
+Soume times you just need a transformer-based, low amperage power supply for pedal where the switchmode-based, modern supplies are just too noisy.  This was the cheapest.  So it goes.

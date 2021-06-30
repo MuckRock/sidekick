@@ -1,0 +1,1 @@
+Windows 7 install worked fine.I use Mixcraft Pro 6 and it's working well.I did have an issue with the drivers, since I had too many midi devices, but the fix wasn't too hard.

@@ -1,0 +1,1 @@
+Getting a proper pedal power unit (like Voodoo labs, DC brick, Ciok) is recommended. Even though this has a lot of outlets, each pedal may not receive enough power. I usually use this to power two or three pedals and most of the time it is ok. Any more than that, and you will have some loss of headroom in the pedals. May not power some pedals that have a high current draw.

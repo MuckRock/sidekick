@@ -1,0 +1,1 @@
+This is a basic EQ pedal, that is a bit noisy in my testing. Even when running on battery power, there is a bit of hiss that is just enough to be annoying in my rig and probably enought to be very annoying in some higher gain rigs.
