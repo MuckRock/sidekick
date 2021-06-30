@@ -68,10 +68,10 @@
     const constraints = {};
     const positiveDocs = {};
 
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       constraints[tag] = [];
       positiveDocs[tag] = [];
-      const documents = Object.keys(documentTags[tag] || {}).map(idx =>
+      const documents = Object.keys(documentTags[tag] || {}).map((idx) =>
         parseInt(idx)
       );
 
@@ -129,7 +129,7 @@
   const documentExpansions = {};
 
   $: allExpanded = displayedDocs.every(
-    doc =>
+    (doc) =>
       documentExpansions[doc.index] != null &&
       documentExpansions[doc.index].expanded
   );
@@ -147,7 +147,7 @@
           ? true
           : forceRetract
           ? false
-          : !documentExpansions[document.index].expanded
+          : !documentExpansions[document.index].expanded,
       };
       return;
     }
@@ -163,7 +163,7 @@
     if (text == null) return;
     documentExpansions[document.index] = {
       expanded: true,
-      contents: text
+      contents: text,
     };
     return;
   }
@@ -171,10 +171,10 @@
   function expandCollapseAll(forceExpand = false) {
     if (forceExpand || !allExpanded) {
       // Expand all
-      displayedDocs.forEach(doc => expandRetract(doc, true));
+      displayedDocs.forEach((doc) => expandRetract(doc, true));
     } else {
       // Retract all
-      displayedDocs.forEach(doc => expandRetract(doc, false, true));
+      displayedDocs.forEach((doc) => expandRetract(doc, false, true));
     }
   }
 
@@ -192,9 +192,9 @@
         {
           method: "post",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(pairwiseConstraints)
+          body: JSON.stringify(pairwiseConstraints),
         }
       );
       const { dists, percentiles, percentileDicts } = await response.json();
@@ -266,7 +266,7 @@
     const rawDocuments = await response.json();
     documents = rawDocuments.map((document, index) => ({
       index,
-      name: document
+      name: document,
     }));
   });
 
@@ -306,7 +306,7 @@
           "93": 1,
           "97": 1,
           "98": 1,
-          "99": 1
+          "99": 1,
         },
         Nonresponsive: {
           "9": 1,
@@ -339,7 +339,7 @@
           "93": -1,
           "97": -1,
           "98": -1,
-          "99": -1
+          "99": -1,
         },
         Threats: {
           "11": 1,
@@ -348,8 +348,8 @@
           "14": 1,
           "15": 1,
           "16": 1,
-          "17": 1
-        }
+          "17": 1,
+        },
       };
     } else if (e.code == "KeyM" && e.altKey) {
       await updateModel();
@@ -369,6 +369,7 @@
   button {
     background: $red;
     color: white;
+    margin: 0 10px;
 
     &.gray {
       background: gray;
@@ -379,6 +380,7 @@
       background: $yellow;
       color: black;
       margin-left: -10px;
+      margin-right: 10px;
     }
   }
 
@@ -542,7 +544,8 @@
               <span
                 class="tag"
                 on:click={() => defaultTagSort(tag)}
-                class:active={lastSort != null && lastSort[0] == tag}>
+                class:active={lastSort != null && lastSort[0] == tag}
+              >
                 {tag}
                 <span class="sorter">
                   {#if lastSort != null && lastSort[0] == tag}
@@ -555,7 +558,8 @@
                   disabled={tags.length == 1}
                   on:delete={() => {
                     tags = [...tags.slice(0, i), ...tags.slice(i + 1)];
-                  }} />
+                  }}
+                />
               {/if}
             </th>
           {/each}
@@ -565,7 +569,8 @@
                 on:enter={addTag}
                 on:esc={cancelTag}
                 bind:value={newTag}
-                placeholder="Type in tag..." />
+                placeholder="Type in tag..."
+              />
               <button class:smaller={addingTag} on:click={addTag}>
                 + Add tag
               </button>
@@ -592,16 +597,22 @@
             {#each tags as tag}
               <td
                 class="tagcell"
-                class:positive={documentTags[tag] && documentTags[tag][document.index] == 1}
-                class:negative={documentTags[tag] && documentTags[tag][document.index] == -1}>
+                class:positive={documentTags[tag] &&
+                  documentTags[tag][document.index] == 1}
+                class:negative={documentTags[tag] &&
+                  documentTags[tag][document.index] == -1}
+              >
                 {#if docPercentileDict[tag] != null}
                   {(docPercentileDict[tag][document.index] * 100).toFixed(2)}%
                 {/if}
                 <ModelButton
-                  status={documentTags[tag] ? documentTags[tag][document.index] || 0 : 0}
+                  status={documentTags[tag]
+                    ? documentTags[tag][document.index] || 0
+                    : 0}
                   on:plus={() => assignPositiveTag(document.index, tag)}
                   on:minus={() => assignNegativeTag(document.index, tag)}
-                  on:remove={() => unassignTag(document.index, tag)} />
+                  on:remove={() => unassignTag(document.index, tag)}
+                />
               </td>
             {/each}
           </tr>

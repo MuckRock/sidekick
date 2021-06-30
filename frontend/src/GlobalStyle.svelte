@@ -4,7 +4,8 @@
     color: inherit;
   }
 
-  :global(html, body) {
+  :global(html),
+  :global(body) {
     position: relative;
     width: 100%;
     height: 100%;
@@ -31,7 +32,7 @@
       transform: scale(1.1) translateY(2px);
     }
 
-    &.smaller {
+    &:global(.smaller) {
       transform: scale(0.85);
 
       &:hover {

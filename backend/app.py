@@ -10,7 +10,7 @@ import time
 
 
 # Constants
-MODELS_DIR = "../models"
+MODELS_DIR = "/code/data/models"
 
 
 def expand_collection(collection):
@@ -137,7 +137,9 @@ def update_tags():
     for tag in constraints.keys():
         p_time("running everything")
         doc_dists, doc_percentiles = lego_learn(
-            doc_vectors, constraints[tag], positive_docs[tag],
+            doc_vectors,
+            constraints[tag],
+            positive_docs[tag],
         )
         percentile_dict = {k: v for k, v in enumerate(doc_percentiles)}
         dists[tag] = doc_dists.tolist()

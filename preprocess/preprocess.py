@@ -15,20 +15,23 @@ import fasttext
 import fasttext.util
 import time
 
-if len(sys.argv) != 3:
-    print("Usage: pipenv run [text_dir] [model_name]")
-    sys.exit()
-
 # Parameters
-text_dir = sys.argv[1]
-embedding_model = "cc.en.300.bin"
-script_dir = os.path.dirname(__file__)
-output_dir = os.path.join(script_dir, "../models/", sys.argv[2])
+collection = os.getenv("collection")
+language = os.getenv("language", "en")
+DATA_DIR = os.getenv("code_dir", "/code/data")
+
+print("GOT PARAMS", {"collection": collection, "language": language})
+
+text_dir = os.path.join(DATA_DIR, "collections", collection)
+embedding_dir = os.path.join(DATA_DIR, "embeddings")
+embedding_model = os.path.join(embedding_dir, f"cc.{language}.300.bin")
+output_dir = os.path.join(DATA_DIR, "models", collection)
 vocab_size = 30_000
 token_pattern = re.compile("(?u)\\b\\w\\w+\\b")
 
-# Create output dir if it doesn't exist
+# Create output/embedding directories if they don't exist
 Path(output_dir).mkdir(parents=True, exist_ok=True)
+Path(embedding_dir).mkdir(parents=True, exist_ok=True)
 
 # Helper functions
 def alpha_num_order(string):
@@ -184,7 +187,10 @@ doc_svd = svd_transformer.fit_transform(spell_corrected_tfidf)
 # Calculate doc embeddings
 print_ts("Loading embedding model")
 # Download the embedding model if not present
-fasttext.util.download_model("en", if_exists="ignore")
+working_dir = os.getcwd()
+os.chdir(embedding_dir)
+fasttext.util.download_model(language, if_exists="ignore")
+os.chdir(working_dir)
 model = fasttext.load_model(embedding_model)
 embedding_vectors = np.array(
     [model.get_word_vector(feature) for feature in spell_corrected_features]

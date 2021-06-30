@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  preprocess:
+    image: documentcloud/sidekick_preprocess
+    build:
+      context: ./preprocess
+      dockerfile: ./Dockerfile
+    environment:
+      - collection
+      - language
+    volumes:
+      - ./data:/code/data
+
+  frontend_build:
+    image: node:12
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: npm i

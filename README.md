@@ -4,54 +4,66 @@ Sidekick is a human-in-the-loop tool for document classification.
 
 ## Getting started
 
-To run Sidekick, you will need to first install [Docker](https://docs.docker.com/get-docker/), technology for running applications cross-platform. You will also need some familiarity with the command line.
+Running Sidekick is best achieved using Docker and Docker Compose.
 
-Sidekick operates on collections of `.txt` text files corresponding to a document collection. To get started, prepare a collection of text files and place them in the subdirectory `data/collections/[collection_name]` (where `[collection_name]` is the name of your collection).
+### Installation steps
 
-If you want to try out Sidekick without supplying a collection yourself, you can try using one of the sample collections in the `data/collections` directory (TK).
+- Install [Docker](https://docs.docker.com/get-docker/), a platform for running software on any operating system
+- Install [Docker Compose](https://docs.docker.com/compose/install/) (unnecessary on Windows and Mac since it comes with the Docker install on those platforms)
+- Install the frontend web application by running the following command in your terminal (in the root directory of this repository):
+  ```bash
+  docker compose -f build.yml run --rm frontend_build
+  ```
+
+### Document collections
+
+Sidekick operates on collections of `.txt` text files corresponding to a document collection.
+
+To get started, prepare a collection of text files and place them in the subdirectory `data/collections/[collection_name]` (where `[collection_name]` is the name of your collection).
+
+If you want to try out Sidekick without supplying a collection yourself, you can try using one of the sample collections in the `data/collections/amazon_instrument_reviews` directory (a collection of reviews for instruments on Amazon).
 
 ## Preprocessing
 
-Run the following command in the terminal (from the root directory of this repository), where
+Before Sidekick can be used for a given document collection, the collection must be preprocessed. This step only has to run once per document collection, generally taking between 2 and 15 minutes, depending on the size of the collection and if this is the first time running (in which case additional downloads will occur behind-the-scenes). By frontloading the hard work, Sidekick can be used at interactive speeds for document analysis later on.
 
-- `[collection_name]` is the name of your document collection or one of the sample document collections (basically the name of a subdirectory in the `data/collections` directory)
-- `[LANG]` is the language code of your document collection (`en` is English). These language codes are necessary to use the proper word embedding model — the full list of language models/codes can be found here: https://fasttext.cc/docs/en/crawl-vectors.html#models (look at the download URL of the language models to get the language code, where the URL is structured like `.../cc.[LANG].bin...`).
+To preprocess a document collection, you must pass two parameters:
+
+- `collection`: the folder in which the collection is stored (i.e. `data/collections/[collection_name]` above). This also serves as the name of the collection
+- `language`: the two-letter language code of your document collection (`en` is English). These language codes are necessary to use the proper word embedding model — the full list of language models/codes can be found here: https://fasttext.cc/docs/en/crawl-vectors.html#models (look at the download URL of the language models to get the language code, where the URL is structured like `.../cc.[LANG].bin...`).
+
+Open a terminal and run the following command, substituting `[collection]` and `[language]` with the appropriate parameters from above:
 
 ```bash
-docker compose run -v ./data:/data -e document_directory=[collection_name] -e language=[LANG] --rm preprocess
+collection=[collection] language=[language] docker compose -f build.yml run --rm preprocess
 ```
+
+### Demo collection
+
+If you want to use the demo collection before you try your own data, try running the command above with `collection` set to `amazon_instrument_reviews` and `language` set to `en`:
+
+```bash
+collection=amazon_instrument_reviews language=en docker compose -f build.yml run --rm preprocess
+```
+
+### How long preprocessing takes
 
 As a rough benchmark of running time, this code takes about 5 minutes to process 13k large and messy text docs, or about 2 minutes to process 130k relatively small and clean text docs. It will take a lot longer on first invocation to install dependencies and download the language models. This script uses multiprocessing and is in general pretty CPU-intensive.
 
-## Running the server
+### Troubleshooting
 
-The backend is a minimal Flask app. There are provided Makefiles to quickly run the appropriate commands. From the top-level, run:
+The preprocessing script is generally pretty compute-intensive and can require a few GB of disk space and up to 10 GB of RAM.
 
-```bash
-make server
-```
+On some operating systems, like Mac OS, you may find the preprocessing command fails with a disk space error or a cryptic `Killed` message. If this is the case, you need to increase the disk space (in the former case) or the RAM (in the latter case) available to Docker. This [documentation guide](https://docs.docker.com/docker-for-mac/#resources) covers how to do this on Docker Desktop (applicable to Mac, specifically, but the steps are probably similar for Windows).
 
-The server will launch at `localhost:5000` with auto-reload, but it is an API server only. Run the frontend following the steps below to access the UI.
+## Running the web application
 
-## Running the frontend
-
-First, make sure the frontend dependencies are installed. You will have to have Node installed.
+The web application consists of a backend API server and a web frontend application. You can run both at once by simply issuing the command:
 
 ```bash
-cd frontend
-npm install
+docker compose up
 ```
 
-Then, from the top-level, you can use the provided Makefile to run the frontend server:
+After half a minute or so, the servers should both be launched. You can then access the frontend web application by visiting [localhost:3000](http://localhost:3000) in your web browser.
 
-```bash
-make web
-```
-
-The auto-reloading server will launch at `http://localhost:3000`.
-
-The frontend assumes the backend is running on port 5000. You can change the server URL in the `frontend` directory by modifying `.env`.
-
-### Commands
-
-docker compose build preprocess && docker compose run -v ./preprocess/symspell:/symspell -e DOC_DIR=symspell --rm preprocess
+If the application fails to load, make sure you have installed the frontend, which only needs to happen once (see the last section of _Installation steps_ above).

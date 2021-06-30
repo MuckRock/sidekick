@@ -2,8 +2,11 @@
 ._*
 
 data/collections/*
+data/models/
+data/embeddings
+
+# The sample dataset
 !data/collections/amazon_instrument_reviews
-models/
 
 # Compressed numpy arrays
 *.npz

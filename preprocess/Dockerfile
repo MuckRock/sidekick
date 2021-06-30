@@ -1,7 +1,6 @@
 FROM python:3.7-slim
 
 COPY symspell /code/symspell
-COPY preprocess.py /code/preprocess.py
 
 WORKDIR /code
 
@@ -18,4 +17,5 @@ RUN pip install numpy scipy cython scikit-learn setuptools-rust
 RUN PATH="$HOME/.cargo/bin:$PATH" pip install -e ./symspell/bindings/Python
 RUN pip install -e git://github.com/facebookresearch/fastText.git#egg=fasttext
 
-CMD bash
+COPY preprocess.py /code/preprocess.py
+CMD python preprocess.py
